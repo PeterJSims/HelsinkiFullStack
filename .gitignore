@@ -1,0 +1,6 @@
+notes-frontend
+notes-backend
+node_modules
+.env
+temp
+*notes
