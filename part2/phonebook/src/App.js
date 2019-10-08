@@ -43,9 +43,14 @@ const App = () => {
 		} else if (!persons.some((person) => person.name.toLowerCase() === newName.toLowerCase())) {
 			const newPerson = { name: newName, number: newNumber };
 
-			personsService.create(newPerson).then((res) => {
-				setPersons(persons.concat(res));
-			});
+			personsService
+				.create(newPerson)
+				.then((res) => {
+					setPersons(persons.concat(res));
+				})
+				.catch((error) => {
+					console.log(error.response.data);
+				});
 
 			setNotification(`${newName} has been added `);
 			setStyleType('notification');

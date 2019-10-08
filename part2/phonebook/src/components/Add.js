@@ -7,11 +7,19 @@ const Add = ({ addEntry, newName, handleNameChange, newNumber, handleNumberChang
 
 			<form onSubmit={addEntry}>
 				<div>
-					name: <input placeholder="Enter a new name" value={newName} onChange={handleNameChange} required />
+					name:{' '}
+					<input
+						minlength={3}
+						placeholder="Enter a new name"
+						value={newName}
+						onChange={handleNameChange}
+						required
+					/>
 				</div>
 				<div>
 					number:{' '}
 					<input
+						minlength={8}
 						placeholder="Enter a phone number"
 						value={newNumber}
 						onChange={handleNumberChange}
