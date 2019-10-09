@@ -1,5 +1,25 @@
+const Blog = require('../models/blog');
 const emptyBlog = [];
 
+const blogWithNoLikes = [
+	{
+		title: 'Go To Statement Considered Harmful',
+		author: 'Edsger W. Dijkstra',
+		url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html'
+	}
+];
+const blogWithNoTitle = [
+	{
+		author: 'Edsger W. Dijkstra',
+		url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html'
+	}
+];
+const blogWithNoUrl = [
+	{
+		title: 'Go To Statement Considered Harmful',
+		author: 'Edsger W. Dijkstra'
+	}
+];
 const singleBlog = [
 	{
 		_id: '5a422aa71b54a676234d17f8',
@@ -62,8 +82,26 @@ const blogs = [
 	}
 ];
 
+const nonExistingId = async () => {
+	const blog = new Blog({ content: 'willremovethissoon' });
+	await blog.save();
+	await blog.remove();
+
+	return blog._id.toString();
+};
+
+const blogsInDb = async () => {
+	const blogList = await Blog.find({});
+	return blogList.map((blog) => blog.toJSON());
+};
+
 module.exports = {
 	emptyBlog,
 	singleBlog,
-	blogs
+	blogs,
+	blogWithNoLikes,
+	nonExistingId,
+	blogsInDb,
+	blogWithNoTitle,
+	blogWithNoUrl
 };
