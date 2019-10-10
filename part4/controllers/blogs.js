@@ -1,54 +1,95 @@
 const blogsRouter = require('express').Router();
+const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 const Blog = require('../models/blog');
+const User = require('../models/user');
 
-blogsRouter.get('/', async (request, response) => {
-	const blogs = await Blog.find({});
-	response.json(blogs);
-});
+blogsRouter
+	.route('/')
+	.get(async (req, res, next) => {
+		try {
+			const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 });
+			return res.json(blogs.map((blog) => blog.toJSON()));
+		} catch (err) {
+			console.log(err);
+		}
+	})
+	.post(async (req, res, next) => {
+		if (!req.token || !req.token.id) {
+			return res.status(401).json({ error: 'token missing or invalid' });
+		}
 
-blogsRouter.post('/', async (request, response) => {
-	const blog = new Blog(request.body);
-	if (!blog.likes) {
-		blog.likes = 0;
-	}
-	if (!blog.title) {
-		return response.status(400).json({ error: 'no title provided' });
-	}
-	if (!blog.url) {
-		return response.status(400).json({ error: 'no url provided' });
-	}
+		try {
+			const user = await User.findOne({ _id: req.token.id });
 
-	const addedBlog = await blog.save();
-	response.status(201).json(addedBlog);
-});
+			const blog = new Blog({
+				title: req.body.title,
+				author: req.body.author,
+				url: req.body.url,
+				likes: req.body.likes || 0,
+				user: user._id
+			});
 
-blogsRouter.put('/:id', async (request, response) => {
-	const body = request.body;
+			const savedBlog = await blog.save();
+			user.blogs = user.blogs.concat(savedBlog._id);
+			await user.save();
+			return res.json(savedBlog.toJSON());
+		} catch (err) {
+			next(err);
+		}
+	});
 
-	const blog = {
-		title: body.author,
-		author: body.author,
-		url: body.url,
-		likes: body.likes
-	};
+blogsRouter
+	.route('/:id')
+	.get(async (req, res, next) => {
+		try {
+			const blog = Blog.findById(req.params.id);
+			if (blog) return res.json(blog.toJSON());
+			else return res.status(404).end();
+		} catch (err) {
+			next(err);
+		}
+	})
+	.put(async (req, res, next) => {
+		if (!req.token || !req.token.id) {
+			return res.status(401).json({ error: 'token missing or invalid' });
+		}
 
-	try {
-		const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true });
-		response.json(updatedBlog);
-	} catch (error) {
-		console.log(error);
-		response.status(400).send({ error: error.message });
-	}
-});
+		try {
+			const blog = await Blog.findById(req.params.id);
 
-blogsRouter.delete('/:id', async (request, response) => {
-	try {
-		await Blog.findByIdAndRemove(request.params.id);
-		response.status(204).end();
-	} catch (exception) {
-		console.log(exception);
-		response.status(400).json({ error: 'error with id' });
-	}
-});
+			if (String(blog.user) === req.token.id) {
+				const blog = {
+					title: req.body.title,
+					author: req.body.author,
+					url: req.body.url,
+					likes: req.body.likes
+				};
+
+				const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, blog, { new: true });
+				return res.json(updatedBlog.toJSON());
+			} else return res.status(400).json({ error: 'update not permitted by non owner' });
+		} catch (err) {
+			next(err);
+		}
+	})
+	.delete(async (req, res, next) => {
+		if (!req.token || !req.token.id) {
+			return res.status(401).json({ error: 'token missing or invalid' });
+		}
+
+		try {
+			const blog = await Blog.findById(req.params.id);
+
+			if (String(blog.user) === req.token.id) {
+				await Blog.findByIdAndRemove(req.params.id);
+				await User.updateOne({ _id: req.token.id }, { $pull: { blogs: req.params.id } });
+			} else return res.status(400).json({ error: 'delete not permitted by non owner' });
+
+			return res.status(204).end();
+		} catch (err) {
+			next(err);
+		}
+	});
 
 module.exports = blogsRouter;

@@ -1,30 +1,39 @@
+const userRouter = require('express').Router();
 const bcrypt = require('bcrypt');
-const usersRouter = require('express').Router();
 const User = require('../models/user');
-//BLOGS NOT LINKING WITH USER
-usersRouter.get('/', async (request, response) => {
-	const users = await User.find({}).populate('blogs', { title: 1, author: 1 });
-	response.json(users.map((u) => u.toJSON()));
-});
 
-usersRouter.post('/', async (request, response, next) => {
-	try {
-		const body = request.body;
+userRouter
+	.route('/')
+	.get(async (req, res, next) => {
+		try {
+			const users = await User.find({}).populate('blogs', { url: 1, title: 1, author: 1 });
+			return res.json(users.map((user) => user.toJSON()));
+		} catch (err) {
+			next(err);
+		}
+	})
+	.post(async (req, res, next) => {
+		if (req.body.password.length < 3)
+			return next({
+				name: 'InvalidCharacterLength',
+				message: 'password length must be greater than 3 characters'
+			});
 
-		const saltRounds = 10;
-		const passwordHash = await bcrypt.hash(body.password, saltRounds);
+		try {
+			const salt = 10;
+			const passwordHash = await bcrypt.hash(req.body.password, salt);
 
-		const user = new User({
-			username: body.username,
-			name: body.name,
-			passwordHash
-		});
+			const user = new User({
+				username: req.body.username,
+				passwordHash: passwordHash,
+				name: req.body.name
+			});
 
-		const savedUser = await user.save();
-		response.json(savedUser);
-	} catch (exception) {
-		next(exception);
-	}
-});
+			const savedUser = await user.save();
+			return res.json(savedUser.toJSON());
+		} catch (err) {
+			next(err);
+		}
+	});
 
-module.exports = usersRouter;
+module.exports = userRouter;
