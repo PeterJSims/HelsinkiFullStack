@@ -4,6 +4,7 @@ import loginService from './services/login';
 import Blog from './components/Blog';
 import AddBlog from './components/AddBlog';
 import Notification from './components/Notification';
+import Togglable from './components/Togglable';
 
 const App = () => {
 	const [ blogs, setBlogs ] = useState([]);
@@ -104,7 +105,9 @@ const App = () => {
 		<div>
 			<h2>blogs</h2>
 			{user.name} has logged in <button onClick={handleLogout}>Logout</button>
-			<AddBlog handleSubmit={handleAddBlog} />
+			<Togglable buttonLabel={'new blog'}>
+				<AddBlog handleSubmit={handleAddBlog} />
+			</Togglable>
 			{blogs.map((blog) => <Blog key={blog.id} blog={blog} />)}
 		</div>
 	);
