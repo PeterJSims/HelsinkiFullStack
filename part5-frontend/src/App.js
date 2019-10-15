@@ -3,19 +3,20 @@ import blogService from './services/blogs';
 import loginService from './services/login';
 import Blog from './components/Blog';
 import AddBlog from './components/AddBlog';
+import Notification from './components/Notification';
 
 const App = () => {
 	const [ blogs, setBlogs ] = useState([]);
 	const [ user, setUser ] = useState(null);
 	const [ username, setUsername ] = useState('');
 	const [ password, setPassword ] = useState('');
-	const [ errorMessage, setErrorMessage ] = useState(null);
+	const [ notification, setNotification ] = useState({});
 
 	useEffect(() => {
 		blogService.getAll().then((initialBlogs) => {
 			setBlogs(initialBlogs);
 		});
-	});
+	}, []);
 
 	useEffect(() => {
 		const loggedUserJSON = window.localStorage.getItem('loggedBlogUser');
@@ -41,9 +42,9 @@ const App = () => {
 			setUsername('');
 			setPassword('');
 		} catch (error) {
-			setErrorMessage('Check login information');
+			setNotification({ message: `Check login information`, type: 'error' });
 			setTimeout(() => {
-				setErrorMessage(null);
+				setNotification({});
 			}, 5000);
 		}
 	};
@@ -56,14 +57,20 @@ const App = () => {
 	const handleAddBlog = async (title, author, url) => {
 		const newBlog = await blogService.create(title, author, url);
 		if (newBlog) {
-			setBlogs(blogs.concat(newBlog));
+			setBlogs([ ...blogs, newBlog ]);
 			blogService.getAll().then((blogs) => setBlogs(blogs));
+			setNotification({ message: `${newBlog.title} has been added`, type: 'notification' });
+			setTimeout(() => {
+				setNotification({});
+			}, 5000);
 		}
 	};
 
 	if (user === null) {
 		return (
 			<div className="App">
+				<Notification message={notification.message} type={notification.type} />
+
 				<h1>Blogs</h1>
 
 				<h2>Login</h2>

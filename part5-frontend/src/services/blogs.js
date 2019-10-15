@@ -18,7 +18,6 @@ const create = async ({ title, author, url }) => {
 	};
 
 	const response = await axios.post(baseUrl, { title, author, url }, config);
-	console.log(response);
 	return response.data;
 };
 
