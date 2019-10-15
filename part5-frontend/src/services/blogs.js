@@ -26,4 +26,12 @@ const update = (id, newObject) => {
 	return request.then((response) => response.data);
 };
 
-export default { getAll, create, update, setToken };
+const addLike = (obj) => {
+	obj.likes += 1;
+	const req = axios.put(`${baseUrl}/${obj.id}`, obj, {
+		headers: { Authorization: token }
+	});
+	return req.then((res) => res.data);
+};
+
+export default { getAll, create, update, setToken, addLike };

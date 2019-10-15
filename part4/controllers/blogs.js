@@ -11,7 +11,7 @@ blogsRouter
 			const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 });
 			return res.json(blogs.map((blog) => blog.toJSON()));
 		} catch (err) {
-			console.log(err);
+			next(err);
 		}
 	})
 	.post(async (req, res, next) => {
@@ -30,10 +30,13 @@ blogsRouter
 				user: user._id
 			});
 
-			const savedBlog = await blog.save();
+			let savedBlog = await blog.save();
 			user.blogs = user.blogs.concat(savedBlog._id);
 			await user.save();
-			return res.json(savedBlog.toJSON());
+
+			savedBlog = savedBlog.toJSON();
+			savedBlog.user = { username: user.username, name: user.name };
+			return res.json(savedBlog);
 		} catch (err) {
 			next(err);
 		}
@@ -56,19 +59,20 @@ blogsRouter
 		}
 
 		try {
-			const blog = await Blog.findById(req.params.id);
+			const blog = {
+				title: req.body.title,
+				author: req.body.author,
+				url: req.body.url,
+				likes: req.body.likes
+			};
 
-			if (String(blog.user) === req.token.id) {
-				const blog = {
-					title: req.body.title,
-					author: req.body.author,
-					url: req.body.url,
-					likes: req.body.likes
-				};
+			let updatedBlog = await Blog.findByIdAndUpdate(req.params.id, blog, { new: true });
+			updatedBlog = updatedBlog.toJSON();
 
-				const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, blog, { new: true });
-				return res.json(updatedBlog.toJSON());
-			} else return res.status(400).json({ error: 'update not permitted by non owner' });
+			const user = await User.findOne({ _id: updatedBlog.user });
+			updatedBlog.user = { username: user.username, name: user.name };
+
+			return res.json(updatedBlog);
 		} catch (err) {
 			next(err);
 		}

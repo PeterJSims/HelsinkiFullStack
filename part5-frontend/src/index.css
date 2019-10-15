@@ -28,14 +28,7 @@ code {
 	padding: 15px;
 	margin-bottom: 15px;
 }
-
-.blog {
-	margin: 0;
-	padding: 0.5rem 0;
-	border: 2px black solid;
-	border-radius: 10px;
-}
-
-.blog:hover {
-	background-color: aqua;
+.full-view {
+	border: 1px solid black;
+	padding: 10px;
 }
