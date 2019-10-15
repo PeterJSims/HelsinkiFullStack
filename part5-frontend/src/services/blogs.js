@@ -26,6 +26,13 @@ const update = (id, newObject) => {
 	return request.then((response) => response.data);
 };
 
+const remove = (id) => {
+	const req = axios.delete(`${baseUrl}/${id}`, {
+		headers: { Authorization: token }
+	});
+	return req.then((res) => res.data);
+};
+
 const addLike = (obj) => {
 	obj.likes += 1;
 	const req = axios.put(`${baseUrl}/${obj.id}`, obj, {
@@ -34,4 +41,4 @@ const addLike = (obj) => {
 	return req.then((res) => res.data);
 };
 
-export default { getAll, create, update, setToken, addLike };
+export default { getAll, create, update, setToken, addLike, remove };

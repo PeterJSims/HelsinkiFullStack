@@ -102,11 +102,15 @@ const App = () => {
 	return (
 		<div>
 			<h2>blogs</h2>
-			{user.name} has logged in <button onClick={handleLogout}>Logout</button>
-			<Togglable buttonLabel={'new blog'}>
-				<AddBlog handleSubmit={handleAddBlog} />
-			</Togglable>
-			{blogs.map((blog) => <Blog key={blog.id} blog={blog} />)}
+			<div>
+				{user.name} has logged in <button onClick={handleLogout}>Logout</button>
+			</div>
+			<div>
+				<Togglable buttonLabel={'new blog'}>
+					<AddBlog handleSubmit={handleAddBlog} />
+				</Togglable>
+			</div>
+			<div>{blogs.map((blog) => <Blog user={user} key={blog.id} blog={blog} />)}</div>
 		</div>
 	);
 };
