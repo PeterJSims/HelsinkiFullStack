@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+
 import blogService from '../services/blogs';
 
 const AddBlog = ({ handleSubmit }) => {
@@ -7,7 +9,7 @@ const AddBlog = ({ handleSubmit }) => {
 	const [ url, setUrl ] = useState('');
 
 	const handleAdd = async (event) => {
-		event.preventDefault();
+		// event.preventDefault();
 		const newBlog = await blogService.create({ title, author, url });
 		if (newBlog) {
 			setAuthor('');
@@ -42,6 +44,10 @@ const AddBlog = ({ handleSubmit }) => {
 			</form>
 		</div>
 	);
+};
+
+AddBlog.propTypes = {
+	handleSubmit: PropTypes.func.isRequired
 };
 
 export default AddBlog;
