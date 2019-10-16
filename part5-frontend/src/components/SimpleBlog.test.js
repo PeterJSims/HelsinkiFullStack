@@ -7,7 +7,8 @@ afterEach(cleanup);
 
 const simpleBlog = {
 	author: 'Peter Sims',
-	title: 'simple test blog'
+	title: 'simple test blog',
+	likes: 0
 };
 
 describe('Simple Blog', () => {
