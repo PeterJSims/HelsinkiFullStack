@@ -27,7 +27,7 @@ const Blog = ({ blog, user }) => {
 
 	if (fullView) {
 		return (
-			<div onClick={handleClick} className="full-view">
+			<div onClick={handleClick} className="full-view blog">
 				<div>
 					{blog.title} {blog.author}
 				</div>
