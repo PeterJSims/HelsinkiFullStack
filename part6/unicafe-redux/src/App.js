@@ -27,7 +27,7 @@ const App = ({ store }) => {
 			<button onClick={good}>good</button>
 			<button onClick={neutral}>neutral</button>
 			<button onClick={bad}>bad</button>
-			<button>reset stats</button>
+			<button onClick={reset}>reset stats</button>
 			<div>good {store.getState().good}</div>
 			<div>neutral {store.getState().neutral} </div>
 			<div>bad {store.getState().bad}</div>
