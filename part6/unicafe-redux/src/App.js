@@ -16,6 +16,11 @@ const App = ({ store }) => {
 			type: 'BAD'
 		});
 	};
+	const reset = () => {
+		store.dispatch({
+			type: 'ZERO'
+		});
+	};
 
 	return (
 		<div>
