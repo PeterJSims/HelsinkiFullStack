@@ -5,3 +5,5 @@ node_modules
 .env
 temp
 *notes
+counter-redux
+notes-redux
