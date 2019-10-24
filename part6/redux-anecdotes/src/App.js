@@ -1,13 +1,15 @@
 import React from 'react';
 import Anecdotes from './components/AnecdoteList';
 import AnecdoteForm from './components/AnecdoteForm';
+import Notification from './components/Notification';
 
-const App = (props) => {
+const App = ({ store }) => {
 	return (
 		<div>
 			<h2>Anecdotes</h2>
-			<AnecdoteForm store={props.store} />
-			<Anecdotes store={props.store} />
+			{store.getState().notification === null ? <div /> : <Notification store={store} />}
+			<AnecdoteForm store={store} />
+			<Anecdotes store={store} />
 		</div>
 	);
 };
