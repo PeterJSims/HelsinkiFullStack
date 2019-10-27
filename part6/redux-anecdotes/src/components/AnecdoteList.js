@@ -1,27 +1,25 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { voteIncrease } from '../reducers/anecdoteReducer';
 import { addNotification } from '../reducers/notificationReducer';
 
-const Anecdotes = ({ store }) => {
-	const { anecdotes, filter } = store.getState();
-
+const Anecdotes = (props) => {
 	const vote = (id, content) => {
-		store.dispatch(voteIncrease(id));
+		props.voteIncrease(id);
 		sendNotification(content);
 	};
 
 	const sendNotification = (content) => {
-		console.log(content);
-		store.dispatch(addNotification(`'${content}' been upvoted`));
+		props.addNotification(`'${content}' been upvoted`);
 		setTimeout(() => {
-			store.dispatch(addNotification(null));
+			props.addNotification(null);
 		}, 5000);
 	};
 	return (
 		<div>
-			{anecdotes.map(
+			{props.anecdotes.map(
 				(anecdote) =>
-					anecdote.content.toLowerCase().includes(filter) ? (
+					anecdote.content.toLowerCase().includes(props.filter) ? (
 						<div key={anecdote.id}>
 							<p>{anecdote.content}</p>
 							<p>
@@ -35,4 +33,17 @@ const Anecdotes = ({ store }) => {
 	);
 };
 
-export default Anecdotes;
+const mapStateToProps = (state) => {
+	return {
+		filter: state.filter,
+		notification: state.notification,
+		anecdotes: state.anecdotes
+	};
+};
+
+const mapDispatchToProps = {
+	addNotification,
+	voteIncrease
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Anecdotes);

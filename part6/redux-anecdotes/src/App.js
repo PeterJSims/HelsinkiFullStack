@@ -8,10 +8,10 @@ const App = ({ store }) => {
 	return (
 		<div>
 			<h2>Anecdotes</h2>
-			{store.getState().notification === null ? <div /> : <Notification store={store} />}
-			<Filter store={store} />
-			<AnecdoteForm store={store} />
-			<Anecdotes store={store} />
+			<Notification />
+			<Filter />
+			<AnecdoteForm />
+			<Anecdotes />
 		</div>
 	);
 };
