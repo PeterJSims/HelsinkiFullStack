@@ -9,7 +9,7 @@ import { initializeAnecdotes } from './reducers/anecdoteReducer';
 const App = (props) => {
 	useEffect(
 		() => {
-			props.initialiseAnecdotes();
+			props.initializeAnecdotes();
 		},
 		[ props ]
 	);
@@ -23,5 +23,8 @@ const App = (props) => {
 		</div>
 	);
 };
+const mapDispatchToProps = {
+	initializeAnecdotes
+};
 
-export default connect(null, { initializeAnecdotes })(App);
+export default connect(null, mapDispatchToProps)(App);

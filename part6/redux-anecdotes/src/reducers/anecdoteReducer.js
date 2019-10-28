@@ -1,61 +1,51 @@
-// const initialAnecdotes = [
-// 	'If it hurts, do it more often',
-// 	'Adding manpower to a late software project makes it later!',
-// 	'The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.',
-// 	'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
-// 	'Premature optimization is the root of all evil.',
-// 	'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.'
-// ];
+import anecdoteService from '../services/anecdotes';
 
-// const getId = () => (100000 * Math.random()).toFixed(0);
-
-// const asObject = (anecdote) => {
-// 	return {
-// 		content: anecdote,
-// 		id: getId(),
-// 		votes: 0
-// 	};
-// };
-
-// const initialState = initialAnecdotes.map(asObject);
-
-const anecdoteReducer = (state = [], action) => {
+const reducer = (state = [], action) => {
 	switch (action.type) {
-		case 'INCREASE':
-			return (
-				state
-					.map(
-						(anecdote) =>
-							anecdote.id !== action.data.id ? anecdote : { ...anecdote, votes: anecdote.votes + 1 }
-					)
-					//NOTE:  Check how to make it not resort every time!!
-					.sort((a, b) => (a.votes < b.votes ? 1 : -1))
-			);
+		case 'INCREASE_VOTE':
+			return state
+				.map(
+					(anecdote) =>
+						anecdote.id !== action.data.id ? anecdote : { ...anecdote, votes: anecdote.votes + 1 }
+				)
+				.sort((a, b) => (a.votes < b.votes ? 1 : -1));
 		case 'NEW_ANECDOTE':
 			return [ ...state, action.data ];
-		case 'INIT_ANEC':
+		case 'INIT_ANECDOTES':
 			return action.data;
 		default:
 			return state;
 	}
 };
 
-export const voteIncrease = (id) => {
-	return { type: 'INCREASE', data: { id } };
-};
-
-export const newAnecdote = (data) => {
-	return {
-		type: 'NEW_ANECDOTE',
-		data
+export const voteIncrease = (object) => {
+	return async (dispatch) => {
+		const data = await anecdoteService.increaseVote(object);
+		dispatch({
+			type: 'INCREASE_VOTE',
+			data: data
+		});
 	};
 };
 
-export const initializeAnecdotes = (anecdotes) => {
-	return {
-		type: 'INIT_ANEC',
-		data: anecdotes
+export const newAnecdote = (content) => {
+	return async (dispatch) => {
+		const data = await anecdoteService.createNew(content);
+		dispatch({
+			type: 'NEW_ANECDOTE',
+			data: data
+		});
 	};
 };
 
-export default anecdoteReducer;
+export const initializeAnecdotes = () => {
+	return async (dispatch) => {
+		const data = await anecdoteService.getAll();
+		dispatch({
+			type: 'INIT_ANECDOTES',
+			data: data
+		});
+	};
+};
+
+export default reducer;
