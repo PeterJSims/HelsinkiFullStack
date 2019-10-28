@@ -13,9 +13,9 @@ const createNew = async (content) => {
 	return res.data;
 };
 
-//FIX VOTING ON DB
-const increaseVote = async (id) => {
-	const res = await axios.put(baseUrl, id);
+const increaseVote = async (object) => {
+	const response = await axios.put(`${baseUrl}/${object.id}`, { ...object, votes: object.votes + 1 });
+	return response.data;
 };
 
 export default { getAll, createNew, increaseVote };
